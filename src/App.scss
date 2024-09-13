@@ -1,0 +1,131 @@
+@import 'colors.scss';
+
+#screen {
+  // max-width: 1280px;
+}
+
+#desktop {
+  background-color: $color-purple;
+  height: 100vh;
+  width: 100vw;
+}
+
+.menu {
+  &-screen {
+    background-color: $color-pink;
+    display: flex;
+    height: auto;
+    border-bottom: solid;
+
+    .app-version {
+      width: 100%;
+      padding-right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+  }
+  &-item {
+    background-color: $color-pink;
+    padding: .25rem 1rem;
+  }
+  &-item:hover {
+    @extend .invert;
+  }
+  &-sub {
+    position: absolute;
+    border: solid;
+  }
+}
+
+.window {
+  &-frame {
+    position: absolute;
+    background-color: $color-purple;
+    @extend .two-tone-border;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  &-top {
+    border-bottom: solid;
+    height: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    background-color: $color-pink;
+    span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    span:first-child {
+      width: 1.5rem;
+      border-right: solid;
+      span {
+        border: none;
+        transform: rotate(-180deg);
+      }
+    }
+    span.title {
+      width: calc(100% - 3.4rem);
+    }
+    span:last-child {
+      width: 1.5rem;
+      border-left: solid;
+    }
+  }
+  &-bottom, &-corner {
+    background-color: $color-pink;
+    height: 1.5rem;
+    width: 1.5rem;
+    border-left: solid;
+  }
+  &-middle, &-content, &-bottom {
+    display: flex;
+  }
+  &-middle {
+    background-color: $color-pink;
+    height: 100%;
+    min-width: 16rem;
+    min-height: 16rem;
+  }
+  &-content {
+    flex-wrap: wrap;
+    width: calc(100% - 1.7rem);
+    overflow: hidden;
+    background-color: $color-purple;
+    border-right: solid;
+  }
+  &-bottom {
+    justify-content: flex-end;
+    border-left: 0;
+    border-top: solid;
+    width: 100%;
+  }
+}
+
+.full-size {
+  top: 0px;
+  left: 0px;
+  width: calc(100vw - 6px);
+  height: calc(100vh - 32px);
+}
+
+.two-tone-border {
+  border-style: solid;
+  border-color: $color-pink $color-almost-black $color-almost-black $color-pink;
+}
+
+.show {
+  visibility: visible;
+}
+
+.hide {
+  visibility: hidden;
+}
+
+.invert {
+  filter: invert(1)
+}
