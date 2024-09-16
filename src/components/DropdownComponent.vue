@@ -43,15 +43,5 @@ const hideDropdown = () => {
 </script>
 
 <style scoped>
-.dropdown {
-  /* Add your dropdown styles here */
-}
 
-.menu-sub {
-  /* Add your menu-sub styles here */
-}
-
-.invert {
-  /* Styling for the inverted state */
-}
 </style>

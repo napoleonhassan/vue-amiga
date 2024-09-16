@@ -39,26 +39,25 @@
 
 <script setup lang="ts">
 import { computed, defineProps, ref } from 'vue';
-import { useStore } from 'vuex'; // Assuming you're using Vuex for state management
 import { upCount } from '../utils/Utils';
+import { useWindowStore, windowTemplate } from '@/store/index'
 
 // Props
-const props = defineProps<{
-  title?: string;
-  id?: string;
-}>();
+const props = defineProps<windowTemplate>();
 
 const title = props.title ?? "";
-const id = props.id ?? "0";
+const adjPos = props.adjPos ?? { x: 0, y: 0 };
 
-// Vuex store for dispatch (equivalent of useAppDispatch)
-const store = useStore();
+const adjX = adjPos.x * 30;
+const adjY = adjPos.y * 30;
 
 // Reactive state (similar to useState in React)
 const zi = ref(upCount());
 const max = ref(false);
-const posi = ref({ x: 100, y: 100 });
+const posi = ref({ x: 100 + adjX, y: 100 + adjY });
 const offs = ref({ x: 100, y: 100 });
+
+const { remove } = useWindowStore();
 
 // Methods
 const bringToFront = () => {
@@ -66,7 +65,7 @@ const bringToFront = () => {
 };
 
 const removeWindow = () => {
-  store.dispatch('windows/removeWindow', { id, title });
+  remove({ payload: { ...props } })
 };
 
 const getLayerX = (event: MouseEvent) => {
@@ -130,22 +129,5 @@ const windowStyle = computed(() => {
 .custom-size {
   width: 400px;
   height: 300px;
-}
-
-/* .window-top {
-  cursor: move;
-}
-
-.title {
-  cursor: move;
-} */
-
-.window-middle {
-  /* Add your styles for the window content */
-}
-
-.window-bottom,
-.window-corner {
-  /* Add styles as needed */
 }
 </style>
