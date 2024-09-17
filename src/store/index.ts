@@ -1,28 +1,38 @@
 import { defineStore } from 'pinia'
-import { uniqueNumber } from '@/utils/Utils';
+import { uniqueNumber, upCount } from '@/utils/Utils';
 
-export interface windowTemplate {
-  id?: string,
+export interface WindowTemplate {
+  id: string,
   title: string,
-  adjPos?: {
-    x: number,
-    y: number
-  }
+  zi: number
 }
 
 export const useWindowStore = defineStore('windows', {
   state: () => {
     return {
-      windows: [{ title: 'Eduardo', id: uniqueNumber() }]
+      windows: [] as WindowTemplate[],
+      focused: ''
     }
   },
   actions: {
-    add(action: { payload: windowTemplate; }) {
+    add(action: { payload: WindowTemplate; }) {
       if (this.windows.find(({id}) => id == action.payload.id)) return;
-      this.windows = [...this.windows, {...action.payload, id: action.payload.id || uniqueNumber()}];
+      const newId = action.payload.id || uniqueNumber();
+      this.focused = newId;
+      this.windows = [...this.windows, {...action.payload, id: action.payload.id || newId, zi: upCount()}];
     },
-    remove(action: { payload: windowTemplate; }) {
+    remove(action: { payload: WindowTemplate; }) {
       this.windows = [...this.windows.filter((w) => w.id !== action.payload.id)];
+      this.focused = (this.windows && this.windows.length) ? 
+      this.windows.reduce((max : WindowTemplate, win : WindowTemplate) => (win.zi > max.zi ? win : max)).id 
+      : '';
+    },
+    update(action: { payload: { id: string, zi: number, pos?: { x: number, y: number }}}) {
+      const { id, zi } = action.payload;    
+      this.windows = this.windows.map(w => w.id === id ? { ...w, zi } : w);
+    },
+    focus(action: { payload: { id: string } }) {
+      this.focused = action.payload.id;
     }
   },
 })

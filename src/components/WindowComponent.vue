@@ -2,31 +2,30 @@
   <div
     :class="['window-frame', max ? 'full-size' : 'custom-size']"
     @mousedown="bringToFront"
+    @mouseup="updateState"
     :style="windowStyle"
   >
     <div class="window-top">
-      <!-- Close Window Icon -->
+
       <span @click="removeWindow">
         <span>■</span>
       </span>
 
-      <!-- Draggable Title -->
       <span
         class="title"
         @mousedown="startDrag"
         @mousemove="onMouseMove"
       >
-        {{ title }}
+        {{ active ? `* ${title} *` : title }}
       </span>
 
-      <!-- Maximize/Restore Button -->
-      <span @click="toggleMaximize">{{ max ? '-' : '+' }}</span>
+      <span @click="toggleFullWindow">{{ max ? '-' : '+' }}</span>
     </div>
 
-    <!-- Window content -->
     <div class="window-middle">
       <div class="window-content">
         <!-- PLACE WINDOW CONTENT HERE -->
+                
       </div>
       <div class="window-right" />
     </div>
@@ -39,65 +38,70 @@
 
 <script setup lang="ts">
 import { computed, defineProps, ref } from 'vue';
-import { upCount } from '../utils/Utils';
-import { useWindowStore, windowTemplate } from '@/store/index'
+import { upCount } from '@/utils/Utils';
+import { useWindowStore, WindowTemplate } from '@/store/index'
+
+interface ExtendedWindowTemplate extends WindowTemplate {
+  index?: number
+}
 
 // Props
-const props = defineProps<windowTemplate>();
-
+const props = defineProps<ExtendedWindowTemplate>();
 const title = props.title ?? "";
-const adjPos = props.adjPos ?? { x: 0, y: 0 };
+const index = ref(props.index);
+const id = ref(props.id);
 
-const adjX = adjPos.x * 30;
-const adjY = adjPos.y * 30;
+const indexOffset = {
+  x: index.value * 30,
+  y: index.value * 30
+}
 
-// Reactive state (similar to useState in React)
-const zi = ref(upCount());
+const zi = ref(props.zi);
 const max = ref(false);
-const posi = ref({ x: 100 + adjX, y: 100 + adjY });
-const offs = ref({ x: 100, y: 100 });
+const position = ref({ x: 100 + indexOffset.x, y: 100 + indexOffset.y });
+const offset = ref({ x: 100, y: 100 });
 
-const { remove } = useWindowStore();
+const store = useWindowStore();
 
 // Methods
 const bringToFront = () => {
   zi.value = upCount();
+  store.focus({ payload: { ...props } })
+};
+
+const updateState = () => {
+  store.update({ payload: { ...props, zi: zi.value }});
 };
 
 const removeWindow = () => {
-  remove({ payload: { ...props } })
+  store.remove({ payload: { ...props } })
 };
 
-const getLayerX = (event: MouseEvent) => {
-  return event.clientX - (event.target as HTMLElement).getBoundingClientRect().x;
-};
-
-const getLayerY = (event: MouseEvent) => {
-  return event.clientY - (event.target as HTMLElement).getBoundingClientRect().y;
-};
+const active = computed(() => {
+  return store.focused === id.value;
+});
 
 // Drag and move logic
 const startDrag = (event: MouseEvent) => {
-  offs.value = {
-    x: getLayerX(event),
-    y: getLayerY(event),
+  offset.value = {
+    x: event.offsetX,
+    y: event.offsetY
   };
 };
 
 const onMouseMove = (event: MouseEvent) => {
   if (event.buttons === 1 && !max.value) {
-    posi.value = {
-      x: event.clientX - (offs.value.x + 30),
-      y: event.clientY - (offs.value.y + 2),
+    position.value = {
+      x: event.clientX - (offset.value.x + 30),
+      y: event.clientY - (offset.value.y + 2),
     };
   }
 };
 
-const toggleMaximize = () => {
+const toggleFullWindow = () => {
   max.value = !max.value;
 };
 
-// Computed style for window position and z-index
 const windowStyle = computed(() => {
   if (max.value) {
     return {
@@ -108,8 +112,8 @@ const windowStyle = computed(() => {
     };
   } else {
     return {
-      left: `${posi.value.x}px`,
-      top: `${posi.value.y}px`,
+      left: `${position.value.x}px`,
+      top: `${position.value.y}px`,
       zIndex: zi.value,
     };
   }

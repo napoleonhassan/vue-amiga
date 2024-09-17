@@ -4,8 +4,9 @@
       v-for="(window, index) in store.windows"
       :title="window.title"
       :id="window.id"
-      :adjPos="{ x: index, y: index }"
+      :zi="upCount()"
       :key="`window-${window.id}`"
+      :index="index"
     />
   </div>
 </template>
@@ -13,6 +14,8 @@
 <script setup lang="ts">
 
 import { useWindowStore } from '@/store/index'
+
+import { upCount } from '@/utils/Utils';
 
 import WindowComponent from '@/components/WindowComponent.vue';
 

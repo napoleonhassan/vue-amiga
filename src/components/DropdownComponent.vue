@@ -23,6 +23,8 @@ const props = defineProps<{
   trigger: string;
 }>();
 
+const trigger = ref(props.trigger)
+
 // State management using ref (similar to useState in React)
 const isShown = ref(false);
 const zi = ref(Date.now());
